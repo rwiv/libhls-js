@@ -1,4 +1,4 @@
-import {M3u8ElemError} from "./errors.js";
+import {M3u8ElemError} from "../common/errors.js";
 
 interface MasterPlaylist {
   resolutions: Resolution[];
