@@ -7,15 +7,13 @@ import {readFile} from "utils-js/file";
 it("test master playlist", async () => {
   const p = path.resolve(getRootPath(), "tests", "test_master.m3u8");
   const parser = new HlsParser();
-  const m3u8 = await readFile(p);
-  const result = parser.parseMasterPlaylist(m3u8);
+  const result = parser.parseMasterPlaylist(await readFile(p));
   console.log(result);
 });
 
 it("test media playlist", async () => {
   const p = path.resolve(getRootPath(), "tests", "test_media.m3u8");
   const parser = new HlsParser();
-  const m3u8 = await readFile(p);
-  const result = parser.parseMediaPlaylist(m3u8);
+  const result = parser.parseMediaPlaylist(await readFile(p));
   console.log(result);
 });

@@ -33,7 +33,7 @@ export class HlsDownloader {
     }
   }
 
-  async downloadChunk(url: string, headers: Headers, num: number, outDirPath: string) {
+  private async downloadChunk(url: string, headers: Headers, num: number, outDirPath: string) {
     const res = await this.requestChunk(url, headers);
 
     const filePath = path.resolve(outDirPath, `${num + 1}.ts`);
