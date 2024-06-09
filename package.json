@@ -14,10 +14,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "unifs-js": "git+https://github.com/rwiv/unifs-js.git#1.0.0",
+    "fs-extra": "^11.2.0",
     "utils-js": "git+https://github.com/rwiv/utils-js.git#1.0.0"
   },
   "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^20.14.2",
     "typescript": "^5.4.5",
     "vitest": "^1.6.0"
   }
