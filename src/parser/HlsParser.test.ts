@@ -12,8 +12,12 @@ it("test master playlist", async () => {
 });
 
 it("test media playlist", async () => {
-  const p = path.resolve(getRootPath(), "tests", "test_media.m3u8");
+  const testPath = path.resolve(getRootPath(), "tests");
+  const m3u8Path = path.resolve(testPath, "test_media.m3u8");
+  const urlPath = path.resolve(testPath, "test_url.txt");
+  const baseUrl = await readFile(urlPath);
+
   const parser = new HlsParser();
-  const result = parser.parseMediaPlaylist(await readFile(p));
+  const result = parser.parseMediaPlaylist(await readFile(m3u8Path), baseUrl);
   console.log(result);
 });

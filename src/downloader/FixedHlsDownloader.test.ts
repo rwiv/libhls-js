@@ -3,18 +3,17 @@ import path from "path";
 import {getRootPath} from "utils-js/path";
 import {readFile} from "utils-js/file";
 import {HlsParser} from "../parser/HlsParser.js";
-import {concatString} from "utils-js/string";
 import {FixedHlsDownloader} from "./FixedHlsDownloader.js";
 
 it("test", async () => {
   const testPath = path.resolve(getRootPath(), "tests");
   const urlPath = path.resolve(testPath, "test_url.txt");
-  const url = await readFile(urlPath);
+  const baseUrl = await readFile(urlPath);
   const parser = new HlsParser();
   const m3u8Path = path.resolve(testPath, "test_media.m3u8");
-  const {segmentPaths, ext} = parser.parseMediaPlaylist(await readFile(m3u8Path));
+  const {segmentPaths, ext} = parser.parseMediaPlaylist(await readFile(m3u8Path), baseUrl);
 
-  const urls = segmentPaths.map(path => concatString(url, path, "/"));
+  const urls = segmentPaths;
   const headers = {};
   const baseDirPath = testPath;
   const outName = "out";
