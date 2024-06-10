@@ -17,7 +17,7 @@ interface MediaPaths {
 export declare class HlsParser {
     isMedia(m3u8: string): boolean;
     parseMasterPlaylist(m3u8: string): MasterPlaylist;
-    parseMediaPlaylist(m3u8: string): MediaPaths;
+    parseMediaPlaylist(m3u8: string, baseUrlParam?: string): MediaPaths;
     parseMediaPlaylistRaw(m3u8: string): MediaPlaylist;
     private parseElems;
 }

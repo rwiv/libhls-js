@@ -1,5 +1,6 @@
 import { M3u8ElemError } from "../common/errors.js";
 import { getExt } from "utils-js/path";
+import { mergeIntersectedStrings } from "utils-js/string";
 export class HlsParser {
     isMedia(m3u8) {
         return m3u8.includes("#EXTINF");
@@ -21,13 +22,29 @@ export class HlsParser {
         });
         return { resolutions };
     }
-    parseMediaPlaylist(m3u8) {
+    parseMediaPlaylist(m3u8, baseUrlParam = "") {
+        let baseUrl = baseUrlParam;
+        if (baseUrl.endsWith("/")) {
+            baseUrl = baseUrl.slice(0, baseUrl.length - 1);
+        }
         const { segmentPaths: segPaths, initSectionPath, ext } = this.parseMediaPlaylistRaw(m3u8);
-        const segmentPaths = [];
+        const originPaths = [];
         if (initSectionPath !== undefined)
-            segmentPaths.push(initSectionPath);
+            originPaths.push(initSectionPath);
         for (const path of segPaths)
-            segmentPaths.push(path);
+            originPaths.push(path);
+        const segmentPaths = originPaths.map(path => {
+            if (path.match(/https?:/) !== null) {
+                return path;
+            }
+            else {
+                let newPath = path;
+                if (!newPath.startsWith("/")) {
+                    newPath = "/" + newPath;
+                }
+                return mergeIntersectedStrings(baseUrl, newPath);
+            }
+        });
         return { segmentPaths, ext };
     }
     parseMediaPlaylistRaw(m3u8) {
