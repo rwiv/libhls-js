@@ -38,7 +38,7 @@ export class HlsDownloadManager {
     return fetch(url, { method: 'GET', headers });
   }
 
-  async concatTsFiles(outDirPath: string) {
+  async concatTsFiles(outDirPath: string, ext: string = "ts") {
     let files = await readdir(outDirPath);
     files.sort((a, b) => {
       const aa = parseInt(getDirPath(a.filename, "."));
@@ -48,7 +48,7 @@ export class HlsDownloadManager {
       }
       return aa - bb;
     });
-    const filename = getFilename(outDirPath) + ".ts";
+    const filename = getFilename(outDirPath) + "." + ext;
     const filePath = path.resolve(outDirPath, "..", filename);
     for (const file of files) {
       const buffer = await fs.readFile(file.absPath);

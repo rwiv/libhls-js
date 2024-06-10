@@ -12,13 +12,13 @@ it("test", async () => {
   const url = await readFile(urlPath);
   const parser = new HlsParser();
   const m3u8Path = path.resolve(testPath, "test_media.m3u8");
-  const playlist = parser.parseMediaPlaylist(await readFile(m3u8Path));
+  const {segmentPaths, ext} = parser.parseMediaPlaylist(await readFile(m3u8Path));
 
-  const urls = playlist.segmentPaths.map(path => concatString(url, path, "/"));
+  const urls = segmentPaths.map(path => concatString(url, path, "/"));
   const headers = {};
   const baseDirPath = testPath;
   const outName = "out";
 
-  const downloader = new FixedHlsDownloader({urls, headers, baseDirPath, outName});
+  const downloader = new FixedHlsDownloader({urls, headers, baseDirPath, outName, ext});
   await downloader.download();
 });

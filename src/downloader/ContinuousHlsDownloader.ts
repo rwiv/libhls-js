@@ -5,6 +5,8 @@ import fs from "fs-extra";
 import {HttpError, MultipleError} from "../common/errors.js";
 import {HlsDownloader, HttpRequestHeaders} from "../common/types.js";
 import {logger} from "utils-js/logger";
+import {removeQueryString} from "utils-js/url";
+import {getExt} from "utils-js/path";
 
 export type RequestStatus = "PROGRESS" | "COMPLETE";
 
@@ -29,6 +31,11 @@ export class ContinuousHlsDownloader implements HlsDownloader {
     initNum = initNum || 0;
     parallel = parallel || 10;
 
+    let ext = getExt(removeQueryString(baseUrl));
+    if (ext === "") {
+      ext = "ts";
+    }
+
     let num = initNum;
     let msCnt = 0;
     while (true) {
@@ -52,7 +59,7 @@ export class ContinuousHlsDownloader implements HlsDownloader {
       }
       const result = await Promise.allSettled(promises);
 
-      await this.manager.concatTsFiles(outDirPath);
+      await this.manager.concatTsFiles(outDirPath, ext);
       await fs.remove(outDirPath);
 
       const errors = result

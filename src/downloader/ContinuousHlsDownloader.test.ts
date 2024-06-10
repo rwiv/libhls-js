@@ -7,8 +7,8 @@ import {readFile} from "utils-js/file";
 it("test", async () => {
   const testPath = path.resolve(getRootPath(), "tests");
   const urlPath = path.resolve(testPath, "test_continuous_url.txt");
-
   const baseUrl = await readFile(urlPath);
+
   const headers = {};
   const baseDirPath = testPath;
   const outName = "out";

@@ -1,4 +1,5 @@
 import {M3u8ElemError} from "../common/errors.js";
+import {getExt} from "utils-js/path";
 
 interface MasterPlaylist {
   resolutions: Resolution[];
@@ -11,6 +12,13 @@ interface Resolution {
 
 interface MediaPlaylist {
   segmentPaths: string[];
+  initSectionPath: string | undefined;
+  ext: string;
+}
+
+interface MediaPaths {
+  segmentPaths: string[];
+  ext: string;
 }
 
 interface M3u8Element {
@@ -47,18 +55,45 @@ export class HlsParser {
     return {resolutions};
   }
 
-  parseMediaPlaylist(m3u8: string) {
-    const elems = this.parseElems(m3u8)
-      .filter(it => it.header.startsWith("#EXTINF"))
+  parseMediaPlaylist(m3u8: string): MediaPaths {
+    const {segmentPaths: segPaths, initSectionPath, ext} = this.parseMediaPlaylistRaw(m3u8);
+    const segmentPaths: string[] = [];
+    if (initSectionPath !== undefined)
+      segmentPaths.push(initSectionPath);
+    for (const path of segPaths)
+      segmentPaths.push(path);
 
-    const segmentPaths = elems.map(elem => {
+    return {segmentPaths, ext};
+  }
+
+  parseMediaPlaylistRaw(m3u8: string): MediaPlaylist {
+    const elems = this.parseElems(m3u8);
+    const segElems = elems.filter(it => it.header.startsWith("#EXTINF"))
+
+    const segmentPaths = segElems.map(elem => {
       const path = elem.value;
       if (path === undefined)
         throw new M3u8ElemError(`${elem}`);
       return path;
     });
 
-    return {segmentPaths};
+    let initSectionPath: string | undefined = undefined;
+    const initElem = elems.find(elem => elem.header.startsWith("#EXT-X-MAP"));
+    if (initElem !== undefined) {
+      const match = initElem.header.match(/URI="(.*)"/i);
+      if (match !== null && match.length > 1) {
+        initSectionPath = match[1];
+      }
+    }
+
+    let ext = "ts";
+    if (initSectionPath !== undefined) {
+      ext = getExt(initSectionPath);
+    } else if (segmentPaths.length > 0) {
+      ext = getExt(segmentPaths[0]);
+    }
+
+    return {segmentPaths, initSectionPath, ext};
   }
 
   private parseElems(m3u8: string): M3u8Element[] {

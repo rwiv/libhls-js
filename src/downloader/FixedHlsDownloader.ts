@@ -11,6 +11,7 @@ export interface FixedHlsDownloaderArgs {
   headers: HttpRequestHeaders,
   baseDirPath: string,
   outName: string,
+  ext?: string,
   parallel?: number,
 }
 
@@ -21,7 +22,8 @@ export class FixedHlsDownloader implements HlsDownloader {
   constructor(private readonly args: FixedHlsDownloaderArgs) {}
 
   async download() {
-    let {urls, headers, baseDirPath, outName, parallel} = this.args;
+    let {urls, headers, baseDirPath, outName, ext, parallel} = this.args;
+    ext = ext || "ts";
     parallel = parallel || 10;
 
     const subs = subListsWithIdx(urls, parallel);
@@ -37,7 +39,7 @@ export class FixedHlsDownloader implements HlsDownloader {
       });
       await Promise.all(promises);
 
-      await this.manager.concatTsFiles(tempDirPath);
+      await this.manager.concatTsFiles(tempDirPath, ext);
       await fs.remove(tempDirPath);
     }
   }
