@@ -11,7 +11,8 @@ export class FixedHlsDownloader {
         this.args = args;
     }
     async download() {
-        let { urls, headers, baseDirPath, outName, parallel } = this.args;
+        let { urls, headers, baseDirPath, outName, ext, parallel } = this.args;
+        ext = ext || "ts";
         parallel = parallel || 10;
         const subs = subListsWithIdx(urls, parallel);
         for (const sub of subs) {
@@ -24,7 +25,7 @@ export class FixedHlsDownloader {
                 return this.manager.downloadSegment(elem.value, headers, elem.idx, tempDirPath);
             });
             await Promise.all(promises);
-            await this.manager.concatTsFiles(tempDirPath);
+            await this.manager.concatTsFiles(tempDirPath, ext);
             await fs.remove(tempDirPath);
         }
     }

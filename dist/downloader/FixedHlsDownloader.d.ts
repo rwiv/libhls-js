@@ -4,6 +4,7 @@ export interface FixedHlsDownloaderArgs {
     headers: HttpRequestHeaders;
     baseDirPath: string;
     outName: string;
+    ext?: string;
     parallel?: number;
 }
 export declare class FixedHlsDownloader implements HlsDownloader {

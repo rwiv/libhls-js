@@ -4,6 +4,8 @@ import { exists } from "utils-js/file";
 import fs from "fs-extra";
 import { HttpError, MultipleError } from "../common/errors.js";
 import { logger } from "utils-js/logger";
+import { removeQueryString } from "utils-js/url";
+import { getExt } from "utils-js/path";
 export class ContinuousHlsDownloader {
     args;
     manager = new HlsDownloadManager();
@@ -14,6 +16,10 @@ export class ContinuousHlsDownloader {
         let { baseUrl, headers, baseDirPath, outName, getUrl, initNum, parallel } = this.args;
         initNum = initNum || 0;
         parallel = parallel || 10;
+        let ext = getExt(removeQueryString(baseUrl));
+        if (ext === "") {
+            ext = "ts";
+        }
         let num = initNum;
         let msCnt = 0;
         while (true) {
@@ -34,7 +40,7 @@ export class ContinuousHlsDownloader {
                 }
             }
             const result = await Promise.allSettled(promises);
-            await this.manager.concatTsFiles(outDirPath);
+            await this.manager.concatTsFiles(outDirPath, ext);
             await fs.remove(outDirPath);
             const errors = result
                 .filter(it => it.status === "rejected")
