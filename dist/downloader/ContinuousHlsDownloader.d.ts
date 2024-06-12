@@ -6,7 +6,7 @@ export interface ContinuousHlsDownloaderArgs {
     baseDirPath: string;
     outName: string;
     getUrl: (num: number, baseUrl: string) => string;
-    isComplete: (res: Response) => boolean;
+    isComplete: (response: Response) => boolean;
     initNum?: number;
     parallel?: number;
 }

@@ -5,6 +5,7 @@ import fs from "fs-extra";
 import { logger } from "utils-js/logger";
 import { removeQueryString } from "utils-js/url";
 import { getExt } from "utils-js/path";
+import { HttpError } from "../common/errors.js";
 export class ContinuousHlsDownloader {
     args;
     manager = new HlsDownloadManager();
@@ -50,6 +51,9 @@ export class ContinuousHlsDownloader {
         const res = await this.manager.requestSegment(url, headers);
         if (this.args.isComplete(res)) {
             return "COMPLETE";
+        }
+        if (res.status >= 400) {
+            throw new HttpError(res);
         }
         await this.manager.writeTempFile(res, num, outDirPath);
         return "PROGRESS";

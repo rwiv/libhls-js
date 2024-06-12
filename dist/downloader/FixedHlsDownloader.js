@@ -33,7 +33,7 @@ export class FixedHlsDownloader {
     async downloadSegment(url, headers, num, outDirPath) {
         const res = await this.manager.requestSegment(url, headers);
         if (res.status >= 400) {
-            throw new HttpError(res.status);
+            throw new HttpError(res);
         }
         await this.manager.writeTempFile(res, num, outDirPath);
     }
