@@ -5,6 +5,7 @@ import path from "path";
 import {exists} from "utils-js/file";
 import fs from "fs-extra";
 import {HlsDownloader, HttpRequestHeaders} from "../common/types.js";
+import {HttpError} from "../common/errors.js";
 
 export interface FixedHlsDownloaderArgs {
   urls: string[]
@@ -35,12 +36,22 @@ export class FixedHlsDownloader implements HlsDownloader {
       }
 
       const promises = sub.map(elem => {
-        return this.manager.downloadSegment(elem.value, headers, elem.idx, tempDirPath);
+        return this.downloadSegment(elem.value, headers, elem.idx, tempDirPath);
       });
       await Promise.all(promises);
 
       await this.manager.concatTsFiles(tempDirPath, ext);
       await fs.remove(tempDirPath);
     }
+  }
+
+  async downloadSegment(
+    url: string, headers: HttpRequestHeaders, num: number, outDirPath: string,
+  ): Promise<void> {
+    const res = await this.manager.requestSegment(url, headers);
+    if (res.status >= 400) {
+      throw new HttpError(res.status);
+    }
+    await this.manager.writeTempFile(res, num, outDirPath);
   }
 }

@@ -2,7 +2,6 @@ import { HlsDownloadManager } from "./HlsDownloadManager.js";
 import path from "path";
 import { exists } from "utils-js/file";
 import fs from "fs-extra";
-import { HttpError, MultipleError } from "../common/errors.js";
 import { logger } from "utils-js/logger";
 import { removeQueryString } from "utils-js/url";
 import { getExt } from "utils-js/path";
@@ -30,7 +29,7 @@ export class ContinuousHlsDownloader {
             const promises = [];
             for (let i = 0; i < parallel; i++) {
                 const url = getUrl(num, baseUrl);
-                const promise = this.downloadSegmentWrapper(url, headers, num, outDirPath);
+                const promise = this.downloadSegment(url, headers, num, outDirPath);
                 promises.push(promise);
                 num++;
                 msCnt++;
@@ -39,40 +38,20 @@ export class ContinuousHlsDownloader {
                     msCnt = 0;
                 }
             }
-            const result = await Promise.allSettled(promises);
+            const result = await Promise.all(promises);
             await this.manager.concatTsFiles(outDirPath, ext);
             await fs.remove(outDirPath);
-            const errors = result
-                .filter(it => it.status === "rejected")
-                .map(it => it.reason);
-            if (errors.length > 0) {
-                throw new MultipleError("download requests errors", errors);
-            }
-            const completes = result.filter(it => {
-                return it.value === "COMPLETE";
-            });
-            if (completes.length > 0) {
+            if (result.filter(it => it === "COMPLETE").length > 0) {
                 break;
             }
         }
     }
-    async downloadSegmentWrapper(url, headers, num, outDirPath) {
-        try {
-            await this.manager.downloadSegment(url, headers, num, outDirPath);
-            return "PROGRESS";
+    async downloadSegment(url, headers, num, outDirPath) {
+        const res = await this.manager.requestSegment(url, headers);
+        if (this.args.isComplete(res)) {
+            return "COMPLETE";
         }
-        catch (err) {
-            if (err instanceof HttpError) {
-                if (err.status > 400) {
-                    return "COMPLETE";
-                }
-                else {
-                    throw err;
-                }
-            }
-            else {
-                throw err;
-            }
-        }
+        await this.manager.writeTempFile(res, num, outDirPath);
+        return "PROGRESS";
     }
 }

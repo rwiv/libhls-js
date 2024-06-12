@@ -12,13 +12,11 @@ import path from "path";
 import { getDirPath, getFilename } from "utils-js/path";
 import { Retry } from "utils-js/retry";
 import { readdir } from "utils-js/file";
-import { HttpError } from "../common/errors.js";
 export class HlsDownloadManager {
-    async downloadSegment(url, headers, num, outDirPath) {
-        const res = await this.requestSegment(url, headers);
-        if (res.status >= 400) {
-            throw new HttpError(res.status);
-        }
+    async requestSegment(url, headers) {
+        return fetch(url, { method: 'GET', headers });
+    }
+    async writeTempFile(res, num, outDirPath) {
         const filePath = path.resolve(outDirPath, `${num + 1}.ts`);
         const reader = res.body?.getReader();
         if (reader === undefined) {
@@ -31,9 +29,6 @@ export class HlsDownloadManager {
             }
             read = await reader.read();
         }
-    }
-    async requestSegment(url, headers) {
-        return fetch(url, { method: 'GET', headers });
     }
     async concatTsFiles(outDirPath, ext = "ts") {
         let files = await readdir(outDirPath);

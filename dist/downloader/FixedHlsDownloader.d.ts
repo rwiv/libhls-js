@@ -12,4 +12,5 @@ export declare class FixedHlsDownloader implements HlsDownloader {
     private readonly manager;
     constructor(args: FixedHlsDownloaderArgs);
     download(): Promise<void>;
+    downloadSegment(url: string, headers: HttpRequestHeaders, num: number, outDirPath: string): Promise<void>;
 }

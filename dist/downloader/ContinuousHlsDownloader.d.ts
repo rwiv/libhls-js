@@ -6,6 +6,7 @@ export interface ContinuousHlsDownloaderArgs {
     baseDirPath: string;
     outName: string;
     getUrl: (num: number, baseUrl: string) => string;
+    isComplete: (res: Response) => boolean;
     initNum?: number;
     parallel?: number;
 }
@@ -14,5 +15,5 @@ export declare class ContinuousHlsDownloader implements HlsDownloader {
     private readonly manager;
     constructor(args: ContinuousHlsDownloaderArgs);
     download(): Promise<void>;
-    private downloadSegmentWrapper;
+    downloadSegment(url: string, headers: HttpRequestHeaders, num: number, outDirPath: string): Promise<RequestStatus>;
 }
