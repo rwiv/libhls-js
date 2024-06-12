@@ -6,6 +6,7 @@ import {HlsDownloader, HttpRequestHeaders} from "../common/types.js";
 import {logger} from "utils-js/logger";
 import {removeQueryString} from "utils-js/url";
 import {getExt} from "utils-js/path";
+import {HttpError} from "../common/errors.js";
 
 export type RequestStatus = "PROGRESS" | "COMPLETE";
 
@@ -15,7 +16,7 @@ export interface ContinuousHlsDownloaderArgs {
   baseDirPath: string,
   outName: string,
   getUrl: (num: number, baseUrl: string) => string,
-  isComplete: (res: Response) => boolean,
+  isComplete: (response: Response) => boolean,
   initNum?: number,
   parallel?: number,
 }
@@ -74,6 +75,9 @@ export class ContinuousHlsDownloader implements HlsDownloader {
     const res = await this.manager.requestSegment(url, headers);
     if (this.args.isComplete(res)) {
       return "COMPLETE";
+    }
+    if (res.status >= 400) {
+      throw new HttpError(res);
     }
     await this.manager.writeTempFile(res, num, outDirPath);
     return "PROGRESS";
