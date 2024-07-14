@@ -15,7 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "fs-extra": "^11.2.0",
-    "utils-js": "git+https://github.com/rwiv/utils-js.git#1.0.0"
+    "utils-js": "git+https://github.com/rwiv/utils-js.git#v0.0.1"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
