@@ -1,6 +1,6 @@
 import {HlsDownloadManager} from "./HlsDownloadManager.js";
 import {subListsWithIdx} from "utils-js/list";
-import {logger} from "utils-js/logger";
+import {log} from "jslog";
 import path from "path";
 import {exists} from "utils-js/file";
 import fs from "fs-extra";
@@ -29,7 +29,7 @@ export class FixedHlsDownloader implements HlsDownloader {
 
     const subs = subListsWithIdx(urls, parallel);
     for (const sub of subs) {
-      logger.info(`${sub[0].idx}-${sub[0].idx + parallel}`);
+      log.info(`${sub[0].idx}-${sub[0].idx + parallel}`);
       const tempDirPath = path.resolve(baseDirPath, outName);
       if (!await exists(tempDirPath)) {
         await fs.ensureDir(tempDirPath);

@@ -3,10 +3,10 @@ import path from "path";
 import {exists} from "utils-js/file";
 import fs from "fs-extra";
 import {HlsDownloader, HttpRequestHeaders} from "../common/types.js";
-import {logger} from "utils-js/logger";
 import {removeQueryString} from "utils-js/url";
 import {getExt} from "utils-js/path";
 import {HttpError} from "../common/errors.js";
+import {log} from "jslog";
 
 export type RequestStatus = "PROGRESS" | "COMPLETE";
 
@@ -54,7 +54,7 @@ export class ContinuousHlsDownloader implements HlsDownloader {
 
         msCnt++;
         if (msCnt === parallel) {
-          logger.info(`${num-parallel}-${num}`);
+          log.info(`${num-parallel}-${num}`);
           msCnt = 0;
         }
       }

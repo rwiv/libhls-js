@@ -2,10 +2,10 @@ import { HlsDownloadManager } from "./HlsDownloadManager.js";
 import path from "path";
 import { exists } from "utils-js/file";
 import fs from "fs-extra";
-import { logger } from "utils-js/logger";
 import { removeQueryString } from "utils-js/url";
 import { getExt } from "utils-js/path";
 import { HttpError } from "../common/errors.js";
+import { log } from "jslog";
 export class ContinuousHlsDownloader {
     args;
     manager = new HlsDownloadManager();
@@ -35,7 +35,7 @@ export class ContinuousHlsDownloader {
                 num++;
                 msCnt++;
                 if (msCnt === parallel) {
-                    logger.info(`${num - parallel}-${num}`);
+                    log.info(`${num - parallel}-${num}`);
                     msCnt = 0;
                 }
             }
